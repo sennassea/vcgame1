@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>홈런 타이밍 게임</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-container">
+    <h1>⚾ 홈런 타이밍 게임</h1>
+    <p class="description">공이 스트라이크 존에 들어왔을 때 스페이스바를 누르세요!</p>
+
+    <section class="score-board">
+      <div>점수: <span id="score">0</span></div>
+      <div>남은 공: <span id="ballsLeft">10</span></div>
+      <div>결과: <span id="resultText">대기 중</span></div>
+    </section>
+
+    <section class="field" id="field">
+      <div class="pitcher">🤾</div>
+      <div class="strike-zone"></div>
+      <div class="batter">🏏</div>
+      <div class="ball" id="ball">⚾</div>
+    </section>
+
+    <section class="controls">
+      <button id="startButton">게임 시작</button>
+      <button id="swingButton">스윙!</button>
+    </section>
+
+    <p class="guide">
+      조작: <strong>스페이스바</strong> 또는 <strong>스윙 버튼</strong>
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
