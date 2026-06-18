@@ -88,25 +88,38 @@
       <p id="modalMessage">멋진 타격이에요!</p>
       <strong class="final-score"><span id="finalScore">0</span>점</strong>
 
-      <section class="result-summary" aria-label="타격 결과 요약">
-        <h3>타격 기록</h3>
-        <div class="summary-grid">
-          <div><span>헛스윙/놓침</span><strong><span id="missCount">0</span>개 · <span id="missScore">0</span>점</strong></div>
-          <div><span>안타</span><strong><span id="hitCount">0</span>개 · <span id="hitScore">0</span>점</strong></div>
-          <div><span>홈런</span><strong><span id="homerunCount">0</span>개 · <span id="homerunScore">0</span>점</strong></div>
-          <div><span>퍼펙트 홈런</span><strong><span id="perfectCount">0</span>개 · <span id="perfectScore">0</span>점</strong></div>
+      <section class="result-summary" aria-label="타격 기록">
+        <h3>⚾ 타격 기록</h3>
+        <div class="record-line">
+          <span>헛스윙/놓침</span>
+          <span><strong id="missCount">0</strong>개</span>
+          <span><strong id="missScore">0</strong>점</span>
+        </div>
+        <div class="record-line">
+          <span>안타</span>
+          <span><strong id="hitCount">0</strong>개</span>
+          <span><strong id="hitScore">0</strong>점</span>
+        </div>
+        <div class="record-line">
+          <span>홈런</span>
+          <span><strong id="homerunCount">0</strong>개</span>
+          <span><strong id="homerunScore">0</strong>점</span>
+        </div>
+        <div class="record-line">
+          <span>퍼펙트 홈런</span>
+          <span><strong id="perfectCount">0</strong>개</span>
+          <span><strong id="perfectScore">0</strong>점</span>
         </div>
       </section>
 
-      <section class="ranking-area" aria-label="랭킹 등록 및 목록">
-        <h3>TOP 10 랭킹</h3>
+      <section class="ranking-area" aria-label="랭킹">
+        <h3>🏆 TOP 10</h3>
         <div class="ranking-form">
           <input id="nicknameInput" type="text" maxlength="10" placeholder="닉네임 입력" />
           <button id="saveRankButton" type="button">기록 저장</button>
         </div>
-        <ol id="rankingList" class="ranking-list"></ol>
+        <ol class="ranking-list" id="rankingList"></ol>
       </section>
-
       <button id="restartButton" type="button">다시 하기</button>
     </div>
   </div>
