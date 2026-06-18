@@ -14,16 +14,24 @@
       <span class="ball-icon">⚾</span>
     </header>
 
-    <section class="score-board">
+    <section class="score-board stage-score-board">
       <div class="score-item">
-        <span class="label">점수</span>
+        <span class="label">단계</span>
+        <strong><span id="stageText">1</span>단계</strong>
+      </div>
+      <div class="score-item">
+        <span class="label">단계 점수</span>
         <strong id="score">0</strong>
+      </div>
+      <div class="score-item">
+        <span class="label">목표 점수</span>
+        <strong id="targetScore">15</strong>
       </div>
       <div class="score-item">
         <span class="label">남은 공</span>
         <strong><span id="ballsLeft">10</span> / 10</strong>
       </div>
-      <div class="score-item">
+      <div class="score-item result-score-item">
         <span class="label">결과</span>
         <strong id="resultText">대기 중</strong>
       </div>
@@ -77,19 +85,29 @@
         <button id="swingButton" type="button">스윙 ⚾</button>
         <button id="pauseButton" type="button">일시정지</button>
       </div>
-      <p class="rule-text">노란 존 완전 진입 시 퍼펙트 홈런 3점 · 노란 존 50% 이상 겹치면 홈런 2점 · 하얀 존 안이면 안타 1점</p>
+      <p class="rule-text">1단계는 기본 속도 · 2단계부터 공 속도 랜덤 · 3단계는 목표 점수 20점!</p>
     </section>
   </main>
+
+  <div class="stage-modal" id="stageModal">
+    <div class="stage-card">
+      <div class="modal-icon" id="stageIcon">⚾</div>
+      <h2 id="stageTitle">1단계 도전</h2>
+      <p id="stageCondition">목표 점수 15점 이상을 달성하세요!</p>
+      <div class="stage-prev-result" id="stagePrevResult">첫 단계입니다. 준비되면 시작하세요!</div>
+      <button id="stageStartButton" type="button">1단계 시작</button>
+    </div>
+  </div>
 
   <div class="result-modal hidden" id="resultModal">
     <div class="modal-card" id="modalCard">
       <div class="modal-icon" id="modalIcon">🏆</div>
       <h2 id="modalTitle">승리!</h2>
       <p id="modalMessage">멋진 타격이에요!</p>
-      <strong class="final-score"><span id="finalScore">0</span>점</strong>
+      <strong class="final-score">총점 <span id="finalScore">0</span>점</strong>
 
       <section class="result-summary" aria-label="타격 기록">
-        <h3>⚾ 타격 기록</h3>
+        <h3>⚾ 전체 타격 기록</h3>
         <div class="record-line">
           <span>헛스윙/놓침</span>
           <span><strong id="missCount">0</strong>개</span>
@@ -110,6 +128,11 @@
           <span><strong id="perfectCount">0</strong>개</span>
           <span><strong id="perfectScore">0</strong>점</span>
         </div>
+      </section>
+
+      <section class="stage-result-list" aria-label="단계별 결과">
+        <h3>📋 단계별 결과</h3>
+        <div id="stageResultList"></div>
       </section>
 
       <section class="ranking-area" aria-label="랭킹">

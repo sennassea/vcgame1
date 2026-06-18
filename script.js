@@ -1,6 +1,8 @@
 const ball = document.getElementById("ball");
 const bat = document.getElementById("bat");
 const scoreText = document.getElementById("score");
+const targetScoreText = document.getElementById("targetScore");
+const stageText = document.getElementById("stageText");
 const ballsLeftText = document.getElementById("ballsLeft");
 const resultText = document.getElementById("resultText");
 const startButton = document.getElementById("startButton");
@@ -8,6 +10,12 @@ const swingButton = document.getElementById("swingButton");
 const pauseButton = document.getElementById("pauseButton");
 const restartButton = document.getElementById("restartButton");
 const soundButton = document.getElementById("soundButton");
+const stageModal = document.getElementById("stageModal");
+const stageIcon = document.getElementById("stageIcon");
+const stageTitle = document.getElementById("stageTitle");
+const stageCondition = document.getElementById("stageCondition");
+const stagePrevResult = document.getElementById("stagePrevResult");
+const stageStartButton = document.getElementById("stageStartButton");
 const resultModal = document.getElementById("resultModal");
 const modalCard = document.getElementById("modalCard");
 const modalIcon = document.getElementById("modalIcon");
@@ -25,15 +33,30 @@ const homerunCountText = document.getElementById("homerunCount");
 const homerunScoreText = document.getElementById("homerunScore");
 const perfectCountText = document.getElementById("perfectCount");
 const perfectScoreText = document.getElementById("perfectScore");
+const stageResultList = document.getElementById("stageResultList");
 const nicknameInput = document.getElementById("nicknameInput");
 const saveRankButton = document.getElementById("saveRankButton");
 const rankingList = document.getElementById("rankingList");
 
-let score = 0;
-let ballsLeft = 10;
-let ballX = 250;
+const totalBalls = 10;
+const maxStage = 3;
+const startX = 250;
+const endX = 760;
+const rankingStorageKey = "homerunTimingGameRankings";
+
+const stageSettings = {
+  1: { target: 15, minSpeed: 5.8, maxSpeed: 5.8, description: "기본 속도의 공 10개로 15점 이상을 달성하세요." },
+  2: { target: 15, minSpeed: 5.8, maxSpeed: 8.4, description: "공마다 속도가 랜덤하게 바뀝니다. 15점 이상을 달성하세요." },
+  3: { target: 20, minSpeed: 6.4, maxSpeed: 9.6, description: "더 빠른 랜덤 속도 공 10개로 20점 이상을 달성하세요." }
+};
+
+let currentStage = 1;
+let stageScore = 0;
+let totalScore = 0;
+let ballsLeft = totalBalls;
+let ballX = startX;
 let ballY = 292;
-let speed = 5.8;
+let speed = stageSettings[1].minSpeed;
 let isPlaying = false;
 let isPaused = false;
 let canSwing = false;
@@ -43,25 +66,24 @@ let nextPitchTimer = null;
 let soundOn = true;
 let audioContext = null;
 let rankSavedThisGame = false;
+let lastStageResultText = "첫 단계입니다. 준비되면 시작하세요!";
 
-const totalBalls = 10;
-const winScore = 15;
-const startX = 250;
-const endX = 760;
-const rankingStorageKey = "homerunTimingGameRankings";
-
-const hitStats = {
-  miss: { count: 0, score: 0 },
-  hit: { count: 0, score: 0 },
-  homerun: { count: 0, score: 0 },
-  perfect: { count: 0, score: 0 }
-};
+const stageStats = createStats();
+const totalStats = createStats();
+const stageResults = [];
 
 swingButton.disabled = true;
 pauseButton.disabled = true;
+stageModal.classList.add("hidden");
 renderRankingList();
+updateScoreBoard();
 
-startButton.addEventListener("click", startGame);
+startButton.addEventListener("click", () => {
+  if (isPlaying) return;
+  showStageIntro(currentStage, lastStageResultText);
+});
+
+stageStartButton.addEventListener("click", startStage);
 swingButton.addEventListener("click", swing);
 pauseButton.addEventListener("click", togglePause);
 restartButton.addEventListener("click", prepareRestart);
@@ -69,9 +91,7 @@ soundButton.addEventListener("click", toggleSound);
 saveRankButton.addEventListener("click", saveRanking);
 
 nicknameInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    saveRanking();
-  }
+  if (event.key === "Enter") saveRanking();
 });
 
 document.addEventListener("keydown", (event) => {
@@ -79,37 +99,66 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     swing();
   }
-
-  if (event.code === "KeyP") {
-    togglePause();
-  }
+  if (event.code === "KeyP") togglePause();
 });
 
-function startGame() {
+function createStats() {
+  return {
+    miss: { count: 0, score: 0 },
+    hit: { count: 0, score: 0 },
+    homerun: { count: 0, score: 0 },
+    perfect: { count: 0, score: 0 }
+  };
+}
+
+function resetStats(stats) {
+  stats.miss.count = 0;
+  stats.miss.score = 0;
+  stats.hit.count = 0;
+  stats.hit.score = 0;
+  stats.homerun.count = 0;
+  stats.homerun.score = 0;
+  stats.perfect.count = 0;
+  stats.perfect.score = 0;
+}
+
+function resetAllStats() {
+  resetStats(stageStats);
+  resetStats(totalStats);
+}
+
+function showStageIntro(stage, previousResult) {
+  const setting = stageSettings[stage];
+  stageIcon.textContent = stage === 1 ? "⚾" : stage === 2 ? "🔥" : "🏟️";
+  stageTitle.textContent = `${stage}단계 도전`;
+  stageCondition.innerHTML = `성공 조건: <strong>${setting.target}점 이상</strong><br>${setting.description}`;
+  stagePrevResult.textContent = previousResult;
+  stageStartButton.textContent = `${stage}단계 시작`;
+  stageModal.classList.remove("hidden");
+  resultModal.classList.add("hidden");
+}
+
+function startStage() {
   clearTimeout(nextPitchTimer);
   cancelAnimationFrame(animationId);
 
-  score = 0;
+  stageModal.classList.add("hidden");
+  resetStats(stageStats);
+  stageScore = 0;
   ballsLeft = totalBalls;
-  speed = 5.8;
+  speed = getPitchSpeed();
   isPlaying = true;
   isPaused = false;
   canSwing = false;
   waitingNextPitch = false;
-  rankSavedThisGame = false;
-  resetHitStats();
 
-  resultModal.classList.add("hidden");
   startButton.disabled = true;
   swingButton.disabled = false;
   pauseButton.disabled = false;
   pauseButton.textContent = "일시정지";
-  resultText.textContent = "게임 시작!";
-  nicknameInput.value = "";
-  saveRankButton.disabled = false;
+  resultText.textContent = `${currentStage}단계 시작!`;
   updateScoreBoard();
   resetBall();
-
   nextPitchTimer = setTimeout(throwBall, 500);
 }
 
@@ -117,17 +166,22 @@ function prepareRestart() {
   clearTimeout(nextPitchTimer);
   cancelAnimationFrame(animationId);
 
-  score = 0;
+  currentStage = 1;
+  stageScore = 0;
+  totalScore = 0;
   ballsLeft = totalBalls;
-  speed = 5.8;
+  speed = stageSettings[1].minSpeed;
   isPlaying = false;
   isPaused = false;
   canSwing = false;
   waitingNextPitch = false;
   rankSavedThisGame = false;
-  resetHitStats();
+  lastStageResultText = "첫 단계입니다. 준비되면 시작하세요!";
+  stageResults.length = 0;
+  resetAllStats();
 
   resultModal.classList.add("hidden");
+  stageModal.classList.add("hidden");
   startButton.disabled = false;
   swingButton.disabled = true;
   pauseButton.disabled = true;
@@ -135,6 +189,7 @@ function prepareRestart() {
   resultText.textContent = "대기 중";
   nicknameInput.value = "";
   saveRankButton.disabled = false;
+  saveRankButton.textContent = "기록 저장";
   updateScoreBoard();
   resetBall();
 }
@@ -146,16 +201,23 @@ function throwBall() {
   }
 
   if (ballsLeft <= 0) {
-    endGame();
+    finishStage();
     return;
   }
 
   waitingNextPitch = false;
+  speed = getPitchSpeed();
   resetBall();
   canSwing = true;
   playPitchSound();
   showWhooshText();
   animationId = requestAnimationFrame(moveBall);
+}
+
+function getPitchSpeed() {
+  const setting = stageSettings[currentStage];
+  if (setting.minSpeed === setting.maxSpeed) return setting.minSpeed;
+  return setting.minSpeed + Math.random() * (setting.maxSpeed - setting.minSpeed);
 }
 
 function moveBall() {
@@ -229,13 +291,8 @@ function judgeHit() {
     ballRect.top >= yellowRect.top &&
     ballRect.bottom <= yellowRect.bottom;
 
-  if (isBallFullyInYellow) {
-    return "perfect";
-  }
-
-  if (yellowOverlapArea >= ballArea * 0.5) {
-    return "homerun";
-  }
+  if (isBallFullyInYellow) return "perfect";
+  if (yellowOverlapArea >= ballArea * 0.5) return "homerun";
 
   const ballCenterX = ballRect.left + ballRect.width / 2;
   const ballCenterY = ballRect.top + ballRect.height / 2;
@@ -246,10 +303,7 @@ function judgeHit() {
     ballCenterY >= whiteRect.top &&
     ballCenterY <= whiteRect.bottom;
 
-  if (isBallCenterInWhiteZone) {
-    return "hit";
-  }
-
+  if (isBallCenterInWhiteZone) return "hit";
   return "miss";
 }
 
@@ -270,31 +324,12 @@ function missPitch() {
 }
 
 function addResultStat(type, point) {
-  hitStats[type].count += 1;
-  hitStats[type].score += point;
-  score += point;
-}
-
-function resetHitStats() {
-  hitStats.miss.count = 0;
-  hitStats.miss.score = 0;
-  hitStats.hit.count = 0;
-  hitStats.hit.score = 0;
-  hitStats.homerun.count = 0;
-  hitStats.homerun.score = 0;
-  hitStats.perfect.count = 0;
-  hitStats.perfect.score = 0;
-}
-
-function updateResultSummary() {
-  missCountText.textContent = hitStats.miss.count;
-  missScoreText.textContent = hitStats.miss.score;
-  hitCountText.textContent = hitStats.hit.count;
-  hitScoreText.textContent = hitStats.hit.score;
-  homerunCountText.textContent = hitStats.homerun.count;
-  homerunScoreText.textContent = hitStats.homerun.score;
-  perfectCountText.textContent = hitStats.perfect.count;
-  perfectScoreText.textContent = hitStats.perfect.score;
+  stageStats[type].count += 1;
+  stageStats[type].score += point;
+  totalStats[type].count += 1;
+  totalStats[type].score += point;
+  stageScore += point;
+  totalScore += point;
 }
 
 function scheduleNextPitch(delay) {
@@ -331,11 +366,76 @@ function togglePause() {
 }
 
 function updateScoreBoard() {
-  scoreText.textContent = score;
+  stageText.textContent = currentStage;
+  scoreText.textContent = stageScore;
+  targetScoreText.textContent = stageSettings[currentStage].target;
   ballsLeftText.textContent = ballsLeft;
 }
 
-function endGame() {
+function finishStage() {
+  isPlaying = false;
+  isPaused = false;
+  canSwing = false;
+  waitingNextPitch = false;
+  clearTimeout(nextPitchTimer);
+  cancelAnimationFrame(animationId);
+
+  const target = stageSettings[currentStage].target;
+  const cleared = stageScore >= target;
+  const stageResult = {
+    stage: currentStage,
+    score: stageScore,
+    target,
+    cleared,
+    stats: JSON.parse(JSON.stringify(stageStats))
+  };
+  stageResults.push(stageResult);
+
+  startButton.disabled = false;
+  swingButton.disabled = true;
+  pauseButton.disabled = true;
+  pauseButton.textContent = "일시정지";
+
+  if (cleared && currentStage < maxStage) {
+    playWinSound();
+    lastStageResultText = `${currentStage}단계 성공! ${stageScore}점 / 목표 ${target}점`;
+    resultText.textContent = lastStageResultText;
+    currentStage += 1;
+    stageScore = 0;
+    ballsLeft = totalBalls;
+    updateScoreBoard();
+    setTimeout(() => showStageIntro(currentStage, lastStageResultText), 800);
+    return;
+  }
+
+  endGame(cleared && currentStage === maxStage);
+}
+
+function updateResultSummary() {
+  missCountText.textContent = totalStats.miss.count;
+  missScoreText.textContent = totalStats.miss.score;
+  hitCountText.textContent = totalStats.hit.count;
+  hitScoreText.textContent = totalStats.hit.score;
+  homerunCountText.textContent = totalStats.homerun.count;
+  homerunScoreText.textContent = totalStats.homerun.score;
+  perfectCountText.textContent = totalStats.perfect.count;
+  perfectScoreText.textContent = totalStats.perfect.score;
+}
+
+function renderStageResults() {
+  stageResultList.innerHTML = "";
+  stageResults.forEach((result) => {
+    const line = document.createElement("div");
+    line.className = "stage-result-line";
+    line.innerHTML = `
+      <span>${result.stage}단계 ${result.cleared ? "성공" : "실패"}</span>
+      <span>${result.score}점 / 목표 ${result.target}점</span>
+    `;
+    stageResultList.appendChild(line);
+  });
+}
+
+function endGame(allCleared) {
   isPlaying = false;
   isPaused = false;
   canSwing = false;
@@ -347,25 +447,27 @@ function endGame() {
   swingButton.disabled = true;
   pauseButton.disabled = true;
   pauseButton.textContent = "일시정지";
-  finalScore.textContent = score;
+  finalScore.textContent = totalScore;
   updateResultSummary();
+  renderStageResults();
   renderRankingList();
   nicknameInput.value = "";
   saveRankButton.disabled = false;
+  saveRankButton.textContent = "기록 저장";
 
-  if (score >= winScore) {
+  if (allCleared) {
     modalCard.classList.remove("lose");
     modalIcon.textContent = "🏆";
-    modalTitle.textContent = "승리!";
-    modalMessage.textContent = "15점 이상 달성! 진짜 홈런왕이에요!";
-    resultText.textContent = `승리! 최종 ${score}점`;
+    modalTitle.textContent = "최종 승리!";
+    modalMessage.textContent = `3단계까지 모두 클리어! 총 ${totalScore}점입니다.`;
+    resultText.textContent = `최종 승리! 총 ${totalScore}점`;
     playWinSound();
   } else {
     modalCard.classList.add("lose");
     modalIcon.textContent = "😢";
-    modalTitle.textContent = "패배!";
-    modalMessage.textContent = "아쉽네요! 다시 도전해요!";
-    resultText.textContent = `패배! 최종 ${score}점`;
+    modalTitle.textContent = "도전 종료";
+    modalMessage.textContent = `${currentStage}단계 목표 점수에 도달하지 못했어요.`;
+    resultText.textContent = `도전 종료! 총 ${totalScore}점`;
     playLoseSound();
   }
 
@@ -374,9 +476,7 @@ function endGame() {
 
 function getRankings() {
   const savedRankings = localStorage.getItem(rankingStorageKey);
-
   if (!savedRankings) return [];
-
   try {
     const parsedRankings = JSON.parse(savedRankings);
     return Array.isArray(parsedRankings) ? parsedRankings : [];
@@ -393,7 +493,6 @@ function saveRanking() {
   if (rankSavedThisGame) return;
 
   const nickname = nicknameInput.value.trim();
-
   if (!nickname) {
     nicknameInput.focus();
     nicknameInput.placeholder = "닉네임을 입력하세요!";
@@ -402,7 +501,8 @@ function saveRanking() {
 
   const newRecord = {
     nickname,
-    score,
+    score: totalScore,
+    stage: stageResults.length,
     date: new Date().toLocaleDateString("ko-KR")
   };
 
@@ -446,7 +546,7 @@ function renderRankingList() {
 }
 
 function escapeHtml(text) {
-  return text
+  return String(text)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -480,16 +580,13 @@ function getAudioContext() {
 
 function playTone(frequency, duration, type = "sine", volume = 0.15, startTime = 0) {
   if (!soundOn) return;
-
   const context = getAudioContext();
   const oscillator = context.createOscillator();
   const gain = context.createGain();
-
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, context.currentTime + startTime);
   gain.gain.setValueAtTime(volume, context.currentTime + startTime);
   gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + startTime + duration);
-
   oscillator.connect(gain);
   gain.connect(context.destination);
   oscillator.start(context.currentTime + startTime);
@@ -498,16 +595,13 @@ function playTone(frequency, duration, type = "sine", volume = 0.15, startTime =
 
 function playNoise(duration = 0.25, volume = 0.12, startTime = 0) {
   if (!soundOn) return;
-
   const context = getAudioContext();
   const bufferSize = context.sampleRate * duration;
   const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
   const data = buffer.getChannelData(0);
-
   for (let i = 0; i < bufferSize; i++) {
     data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
   }
-
   const source = context.createBufferSource();
   const gain = context.createGain();
   source.buffer = buffer;
@@ -521,17 +615,14 @@ function playNoise(duration = 0.25, volume = 0.12, startTime = 0) {
 
 function playPitchSound() {
   if (!soundOn) return;
-
   const context = getAudioContext();
   const oscillator = context.createOscillator();
   const gain = context.createGain();
-
   oscillator.type = "sine";
   oscillator.frequency.setValueAtTime(980, context.currentTime);
   oscillator.frequency.exponentialRampToValueAtTime(250, context.currentTime + 0.28);
   gain.gain.setValueAtTime(0.12, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.28);
-
   oscillator.connect(gain);
   gain.connect(context.destination);
   oscillator.start();
