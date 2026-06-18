@@ -1,5 +1,6 @@
 const ball = document.getElementById("ball");
 const bat = document.getElementById("bat");
+const pitcher = document.querySelector(".pitcher");
 const scoreText = document.getElementById("score");
 const targetScoreText = document.getElementById("targetScore");
 const stageText = document.getElementById("stageText");
@@ -209,6 +210,7 @@ function throwBall() {
   speed = getPitchSpeed();
   resetBall();
   canSwing = true;
+  playPitcherThrowAnimation();
   playPitchSound();
   showWhooshText();
   animationId = requestAnimationFrame(moveBall);
@@ -558,6 +560,13 @@ function playSwingAnimation() {
   bat.classList.remove("swinging");
   void bat.offsetWidth;
   bat.classList.add("swinging");
+}
+
+function playPitcherThrowAnimation() {
+  if (!pitcher) return;
+  pitcher.classList.remove("throwing");
+  void pitcher.offsetWidth;
+  pitcher.classList.add("throwing");
 }
 
 function showWhooshText() {

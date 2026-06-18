@@ -920,3 +920,249 @@ button {
     font-size: 14px;
   }
 }
+
+/* v9: 자연스러운 야구선수 투수 디자인 + 투구 모션 */
+.pitcher {
+  left: 72px;
+  top: 205px;
+  width: 215px;
+  height: 238px;
+  transform: rotate(-3deg);
+  transform-origin: 52% 88%;
+}
+
+.pitcher.throwing {
+  animation: pitcherBodyThrow 0.72s ease-in-out;
+}
+
+.pitcher-head {
+  left: 88px;
+  top: 18px;
+  width: 52px;
+  height: 58px;
+  background: #ffd3a8;
+  border-radius: 48% 52% 44% 46%;
+  box-shadow: inset -5px -4px 0 rgba(185, 101, 55, 0.16);
+}
+
+.pitcher-cap {
+  left: 81px;
+  top: 7px;
+  width: 68px;
+  height: 30px;
+  background: linear-gradient(#1862c7, #0b4ea2);
+  border-radius: 34px 34px 11px 11px;
+  z-index: 2;
+}
+
+.pitcher-cap::after {
+  right: -28px;
+  top: 12px;
+  width: 36px;
+  height: 11px;
+  background: #0b4ea2;
+}
+
+.pitcher-face {
+  left: 127px;
+  top: 49px;
+  width: 14px;
+  height: 8px;
+  border-bottom: 3px solid #102033;
+  border-radius: 50%;
+  transform: rotate(-6deg);
+  z-index: 3;
+}
+
+.pitcher-eye {
+  left: 124px;
+  top: 41px;
+  width: 6px;
+  height: 6px;
+  z-index: 3;
+}
+
+.pitcher-body {
+  left: 58px;
+  top: 76px;
+  width: 100px;
+  height: 92px;
+  background: linear-gradient(90deg, #ffffff 0%, #f4f8ff 55%, #dbe8f7 100%);
+  border-radius: 32px 34px 18px 18px;
+  transform: rotate(2deg);
+  box-shadow: inset -8px 0 0 rgba(12, 78, 162, 0.08);
+}
+
+.pitcher-body::before {
+  content: "P";
+  left: 39px;
+  top: 22px;
+  color: #0b4ea2;
+  font-size: 32px;
+}
+
+.pitcher-body::after {
+  content: "";
+  position: absolute;
+  left: 47px;
+  top: 8px;
+  width: 3px;
+  height: 74px;
+  background: rgba(11, 78, 162, 0.28);
+  border-radius: 999px;
+}
+
+.pitcher-arm {
+  height: 21px;
+  background: linear-gradient(#ffd9b5, #f5b57f);
+  z-index: 3;
+}
+
+.throw-arm {
+  left: 132px;
+  top: 93px;
+  width: 82px;
+  transform-origin: 6px 50%;
+  transform: rotate(-48deg);
+}
+
+.throw-arm::after {
+  content: "⚾";
+  position: absolute;
+  right: -22px;
+  top: -16px;
+  font-size: 22px;
+  filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.25));
+}
+
+.glove-arm {
+  left: 22px;
+  top: 99px;
+  width: 82px;
+  transform-origin: 74px 50%;
+  transform: rotate(160deg);
+}
+
+.pitcher-glove {
+  left: 8px;
+  top: 104px;
+  width: 39px;
+  height: 34px;
+  background: radial-gradient(circle at 35% 35%, #9b5c2d 0%, #6f3d1d 68%);
+  border-radius: 45% 55% 48% 58%;
+  z-index: 4;
+}
+
+.pitcher-leg {
+  width: 24px;
+  height: 78px;
+  background: linear-gradient(90deg, #ffffff 0%, #edf3fb 70%);
+  z-index: 2;
+}
+
+.leg-one {
+  left: 78px;
+  top: 159px;
+  transform: rotate(7deg);
+}
+
+.leg-two {
+  left: 122px;
+  top: 151px;
+  transform: rotate(-55deg);
+  transform-origin: 50% 8%;
+}
+
+.pitcher-leg::after {
+  left: -9px;
+  bottom: -13px;
+  width: 42px;
+  height: 15px;
+  background: #0f172a;
+}
+
+.pitcher.throwing .throw-arm {
+  animation: throwArmMotion 0.72s ease-in-out;
+}
+
+.pitcher.throwing .glove-arm,
+.pitcher.throwing .pitcher-glove {
+  animation: glovePullMotion 0.72s ease-in-out;
+}
+
+.pitcher.throwing .leg-two {
+  animation: legKickMotion 0.72s ease-in-out;
+}
+
+.pitcher.throwing .pitcher-head,
+.pitcher.throwing .pitcher-cap,
+.pitcher.throwing .pitcher-face,
+.pitcher.throwing .pitcher-eye {
+  animation: headFollowMotion 0.72s ease-in-out;
+}
+
+.pitcher.throwing .throw-arm::after {
+  animation: releaseBallMotion 0.72s ease-in-out forwards;
+}
+
+@keyframes pitcherBodyThrow {
+  0% { transform: rotate(-3deg) translateX(0); }
+  25% { transform: rotate(-9deg) translateX(-5px); }
+  55% { transform: rotate(8deg) translateX(13px); }
+  78% { transform: rotate(3deg) translateX(8px); }
+  100% { transform: rotate(-3deg) translateX(0); }
+}
+
+@keyframes throwArmMotion {
+  0% { transform: rotate(-48deg); }
+  25% { transform: rotate(-118deg); }
+  48% { transform: rotate(-12deg); }
+  66% { transform: rotate(24deg); }
+  100% { transform: rotate(-48deg); }
+}
+
+@keyframes glovePullMotion {
+  0% { transform: rotate(160deg) translateX(0); }
+  35% { transform: rotate(178deg) translateX(-7px); }
+  62% { transform: rotate(130deg) translateX(10px); }
+  100% { transform: rotate(160deg) translateX(0); }
+}
+
+@keyframes legKickMotion {
+  0% { transform: rotate(-55deg) translateY(0); }
+  26% { transform: rotate(-82deg) translateY(-16px); }
+  58% { transform: rotate(-18deg) translate(18px, 10px); }
+  100% { transform: rotate(-55deg) translateY(0); }
+}
+
+@keyframes headFollowMotion {
+  0% { transform: translateX(0); }
+  45% { transform: translateX(4px); }
+  70% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes releaseBallMotion {
+  0%, 42% { opacity: 1; transform: translate(0, 0) scale(1); }
+  58% { opacity: 1; transform: translate(22px, 6px) scale(0.9); }
+  68%, 100% { opacity: 0; transform: translate(55px, 9px) scale(0.55); }
+}
+
+@media (max-width: 760px) {
+  .pitcher {
+    left: 14px;
+    transform: scale(0.78) rotate(-3deg);
+  }
+
+  .pitcher.throwing {
+    animation: pitcherBodyThrowMobile 0.72s ease-in-out;
+  }
+}
+
+@keyframes pitcherBodyThrowMobile {
+  0% { transform: scale(0.78) rotate(-3deg) translateX(0); }
+  25% { transform: scale(0.78) rotate(-9deg) translateX(-5px); }
+  55% { transform: scale(0.78) rotate(8deg) translateX(13px); }
+  78% { transform: scale(0.78) rotate(3deg) translateX(8px); }
+  100% { transform: scale(0.78) rotate(-3deg) translateX(0); }
+}
