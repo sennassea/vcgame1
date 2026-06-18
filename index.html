@@ -7,44 +7,82 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="game-container">
-    <h1>⚾ 홈런 타이밍 게임</h1>
-    <p class="description">공이 타격존 중앙에 왔을 때 스윙하면 홈런!</p>
+  <main class="game-wrap">
+    <header class="title-area">
+      <span class="ball-icon">⚾</span>
+      <h1>홈런 타이밍 게임</h1>
+      <span class="ball-icon">⚾</span>
+    </header>
 
     <section class="score-board">
-      <div>점수: <span id="score">0</span></div>
-      <div>남은 공: <span id="ballsLeft">10</span></div>
-      <div>결과: <span id="resultText">대기 중</span></div>
+      <div class="score-item">
+        <span class="label">점수</span>
+        <strong id="score">0</strong>
+      </div>
+      <div class="score-item">
+        <span class="label">남은 공</span>
+        <strong><span id="ballsLeft">10</span> / 10</strong>
+      </div>
+      <div class="score-item">
+        <span class="label">결과</span>
+        <strong id="resultText">대기 중</strong>
+      </div>
     </section>
 
+    <button class="sound-button" id="soundButton" type="button">🔊 ON</button>
+
     <section class="field" id="field">
-      <div class="pitcher">🤾‍♂️</div>
-      <div class="hit-zone">
-        <div class="home-run-zone"></div>
+      <div class="sky-deco cloud cloud-a"></div>
+      <div class="sky-deco cloud cloud-b"></div>
+      <div class="fence"></div>
+      <div class="grass-line"></div>
+      <div class="diamond"></div>
+      <div class="mound"></div>
+
+      <div class="pitcher" aria-label="투수">
+        <div class="pitcher-head"></div>
+        <div class="pitcher-cap"></div>
+        <div class="pitcher-body"></div>
+        <div class="pitcher-arm"></div>
+        <div class="pitcher-leg leg-one"></div>
+        <div class="pitcher-leg leg-two"></div>
       </div>
-      <div class="batter-area">
-        <div class="aluminum-bat"></div>
+
+      <div class="whoosh-text" id="whooshText">슉~!</div>
+
+      <div class="strike-zone" id="strikeZone">
+        <div class="homerun-zone" id="homerunZone"></div>
       </div>
+
+      <div class="bat-area">
+        <div class="swing-arc"></div>
+        <div class="bat" id="bat">
+          <div class="bat-barrel"></div>
+          <div class="bat-handle"></div>
+          <div class="bat-knob"></div>
+        </div>
+      </div>
+
       <div class="ball" id="ball">⚾</div>
     </section>
 
-    <section class="controls">
-      <button id="startButton">게임 시작</button>
-      <button id="swingButton">스윙!</button>
+    <section class="control-area">
+      <p>스페이스바 또는 스윙 버튼을 눌러 스윙하세요!</p>
+      <div class="buttons">
+        <button id="startButton" type="button">게임 시작</button>
+        <button id="swingButton" type="button">스윙 ⚾</button>
+      </div>
+      <p class="rule-text">노란 존 50% 이상 겹치면 홈런 2점 · 하얀 존 안이면 안타 1점</p>
     </section>
-
-    <p class="guide">
-      조작: <strong>스페이스바</strong> 또는 <strong>스윙 버튼</strong><br />
-      안타: 1점 / 홈런: 2점 / 10점 이상이면 승리
-    </p>
   </main>
 
   <div class="result-modal hidden" id="resultModal">
     <div class="modal-card" id="modalCard">
-      <p class="modal-emoji" id="modalEmoji">🏆</p>
+      <div class="modal-icon" id="modalIcon">🏆</div>
       <h2 id="modalTitle">승리!</h2>
-      <p id="modalMessage">결과 메시지</p>
-      <button id="restartButton">다시 시작</button>
+      <p id="modalMessage">멋진 타격이에요!</p>
+      <strong class="final-score"><span id="finalScore">0</span>점</strong>
+      <button id="restartButton" type="button">다시 하기</button>
     </div>
   </div>
 

@@ -1,41 +1,46 @@
 const ball = document.getElementById("ball");
+const bat = document.getElementById("bat");
 const scoreText = document.getElementById("score");
 const ballsLeftText = document.getElementById("ballsLeft");
 const resultText = document.getElementById("resultText");
 const startButton = document.getElementById("startButton");
 const swingButton = document.getElementById("swingButton");
+const restartButton = document.getElementById("restartButton");
+const soundButton = document.getElementById("soundButton");
 const resultModal = document.getElementById("resultModal");
 const modalCard = document.getElementById("modalCard");
-const modalEmoji = document.getElementById("modalEmoji");
+const modalIcon = document.getElementById("modalIcon");
 const modalTitle = document.getElementById("modalTitle");
 const modalMessage = document.getElementById("modalMessage");
-const restartButton = document.getElementById("restartButton");
+const finalScore = document.getElementById("finalScore");
+const strikeZone = document.getElementById("strikeZone");
+const homerunZone = document.getElementById("homerunZone");
+const whooshText = document.getElementById("whooshText");
 
 let score = 0;
 let ballsLeft = 10;
-let ballX = 95;
-let ballY = 125;
-let speed = 5;
+let ballX = 250;
+let ballY = 292;
+let speed = 5.8;
 let isPlaying = false;
 let canSwing = false;
 let animationId = null;
+let soundOn = true;
 let audioContext = null;
 
-const startX = 95;
-const endX = 620;
-
-const hitZoneStart = 563;
-const hitZoneEnd = 620;
-const homeRunZoneStart = 579;
-const homeRunZoneEnd = 604;
+const totalBalls = 10;
+const winScore = 10;
+const startX = 250;
+const endX = 760;
 
 swingButton.disabled = true;
 
 startButton.addEventListener("click", startGame);
 swingButton.addEventListener("click", swing);
 restartButton.addEventListener("click", startGame);
+soundButton.addEventListener("click", toggleSound);
 
-document.addEventListener("keydown", function (event) {
+document.addEventListener("keydown", (event) => {
   if (event.code === "Space") {
     event.preventDefault();
     swing();
@@ -44,32 +49,33 @@ document.addEventListener("keydown", function (event) {
 
 function startGame() {
   score = 0;
-  ballsLeft = 10;
-  speed = 5;
+  ballsLeft = totalBalls;
+  speed = 5.8;
   isPlaying = true;
+  canSwing = false;
 
-  scoreText.textContent = score;
-  ballsLeftText.textContent = ballsLeft;
-  resultText.textContent = "게임 시작!";
+  resultModal.classList.add("hidden");
   startButton.disabled = true;
   swingButton.disabled = false;
-  resultModal.classList.add("hidden");
+  resultText.textContent = "게임 시작!";
+  updateScoreBoard();
+  resetBall();
 
-  throwBall();
+  setTimeout(throwBall, 500);
 }
 
 function throwBall() {
+  if (!isPlaying) return;
+
   if (ballsLeft <= 0) {
     endGame();
     return;
   }
 
-  ballX = startX;
-  ballY = 115 + Math.random() * 35;
+  resetBall();
   canSwing = true;
-  updateBallPosition();
   playPitchSound();
-
+  showWhooshText();
   animationId = requestAnimationFrame(moveBall);
 }
 
@@ -85,9 +91,15 @@ function moveBall() {
   animationId = requestAnimationFrame(moveBall);
 }
 
+function resetBall() {
+  ballX = startX;
+  ballY = 284 + Math.random() * 34;
+  updateBallPosition();
+}
+
 function updateBallPosition() {
-  ball.style.left = ballX + "px";
-  ball.style.top = ballY + "px";
+  ball.style.left = `${ballX}px`;
+  ball.style.top = `${ballY}px`;
 }
 
 function swing() {
@@ -95,38 +107,72 @@ function swing() {
 
   canSwing = false;
   cancelAnimationFrame(animationId);
+  playSwingAnimation();
 
-  if (ballX >= homeRunZoneStart && ballX <= homeRunZoneEnd) {
+  const hitResult = judgeHit();
+
+  if (hitResult === "homerun") {
     score += 2;
     resultText.textContent = "홈런! +2점";
-    playAluminumHitSound(true);
-  } else if (ballX >= hitZoneStart && ballX <= hitZoneEnd) {
+    playAluminumHitSound();
+  } else if (hitResult === "hit") {
     score += 1;
     resultText.textContent = "안타! +1점";
-    playAluminumHitSound(false);
+    playAluminumHitSound();
   } else {
     resultText.textContent = "헛스윙!";
-    playSwingMissSound();
+    playMissSound();
   }
 
   ballsLeft -= 1;
-  updateScore();
-
+  updateScoreBoard();
   setTimeout(throwBall, 900);
+}
+
+function judgeHit() {
+  const ballRect = ball.getBoundingClientRect();
+  const whiteRect = strikeZone.getBoundingClientRect();
+  const yellowRect = homerunZone.getBoundingClientRect();
+
+  const ballArea = ballRect.width * ballRect.height;
+  const yellowOverlapArea = getOverlapArea(ballRect, yellowRect);
+
+  if (yellowOverlapArea >= ballArea * 0.5) {
+    return "homerun";
+  }
+
+  const ballCenterX = ballRect.left + ballRect.width / 2;
+  const ballCenterY = ballRect.top + ballRect.height / 2;
+
+  const isBallCenterInWhiteZone =
+    ballCenterX >= whiteRect.left &&
+    ballCenterX <= whiteRect.right &&
+    ballCenterY >= whiteRect.top &&
+    ballCenterY <= whiteRect.bottom;
+
+  if (isBallCenterInWhiteZone) {
+    return "hit";
+  }
+
+  return "miss";
+}
+
+function getOverlapArea(rectA, rectB) {
+  const overlapWidth = Math.max(0, Math.min(rectA.right, rectB.right) - Math.max(rectA.left, rectB.left));
+  const overlapHeight = Math.max(0, Math.min(rectA.bottom, rectB.bottom) - Math.max(rectA.top, rectB.top));
+  return overlapWidth * overlapHeight;
 }
 
 function missPitch() {
   canSwing = false;
   cancelAnimationFrame(animationId);
-
   resultText.textContent = "공을 놓쳤습니다!";
   ballsLeft -= 1;
-  updateScore();
-
-  setTimeout(throwBall, 900);
+  updateScoreBoard();
+  setTimeout(throwBall, 700);
 }
 
-function updateScore() {
+function updateScoreBoard() {
   scoreText.textContent = score;
   ballsLeftText.textContent = ballsLeft;
 }
@@ -136,34 +182,42 @@ function endGame() {
   canSwing = false;
   startButton.disabled = false;
   swingButton.disabled = true;
+  finalScore.textContent = score;
 
-  if (score >= 10) {
-    resultText.textContent = `승리! 최종 점수 ${score}점`;
-    showResultModal(true);
+  if (score >= winScore) {
+    modalCard.classList.remove("lose");
+    modalIcon.textContent = "🏆";
+    modalTitle.textContent = "승리!";
+    modalMessage.textContent = "10점 이상 달성! 홈런왕이에요!";
+    resultText.textContent = `승리! 최종 ${score}점`;
     playWinSound();
   } else {
-    resultText.textContent = `패배! 최종 점수 ${score}점`;
-    showResultModal(false);
-    playLoseSound();
-  }
-}
-
-function showResultModal(isWin) {
-  modalCard.classList.remove("win", "lose");
-
-  if (isWin) {
-    modalCard.classList.add("win");
-    modalEmoji.textContent = "🏆";
-    modalTitle.textContent = "승리!";
-    modalMessage.textContent = `${score}점 달성! 알루미늄 배트로 멋진 경기를 완성했습니다.`;
-  } else {
     modalCard.classList.add("lose");
-    modalEmoji.textContent = "😢";
+    modalIcon.textContent = "😢";
     modalTitle.textContent = "패배!";
-    modalMessage.textContent = `${score}점입니다. 10점 이상이면 승리할 수 있어요.`;
+    modalMessage.textContent = "아쉽네요! 다시 도전해요!";
+    resultText.textContent = `패배! 최종 ${score}점`;
+    playLoseSound();
   }
 
   resultModal.classList.remove("hidden");
+}
+
+function playSwingAnimation() {
+  bat.classList.remove("swinging");
+  void bat.offsetWidth;
+  bat.classList.add("swinging");
+}
+
+function showWhooshText() {
+  whooshText.classList.remove("show");
+  void whooshText.offsetWidth;
+  whooshText.classList.add("show");
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  soundButton.textContent = soundOn ? "🔊 ON" : "🔇 OFF";
 }
 
 function getAudioContext() {
@@ -173,79 +227,62 @@ function getAudioContext() {
   return audioContext;
 }
 
-function playTone(frequency, duration, type, volume, startTime = 0) {
-  const ctx = getAudioContext();
-  const oscillator = ctx.createOscillator();
-  const gain = ctx.createGain();
+function playTone(frequency, duration, type = "sine", volume = 0.15, startTime = 0) {
+  if (!soundOn) return;
+
+  const context = getAudioContext();
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
 
   oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, ctx.currentTime + startTime);
-  gain.gain.setValueAtTime(volume, ctx.currentTime + startTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+  oscillator.frequency.setValueAtTime(frequency, context.currentTime + startTime);
+  gain.gain.setValueAtTime(volume, context.currentTime + startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + startTime + duration);
 
   oscillator.connect(gain);
-  gain.connect(ctx.destination);
-  oscillator.start(ctx.currentTime + startTime);
-  oscillator.stop(ctx.currentTime + startTime + duration);
+  gain.connect(context.destination);
+  oscillator.start(context.currentTime + startTime);
+  oscillator.stop(context.currentTime + startTime + duration);
 }
 
 function playPitchSound() {
-  const ctx = getAudioContext();
-  const oscillator = ctx.createOscillator();
-  const gain = ctx.createGain();
+  if (!soundOn) return;
+
+  const context = getAudioContext();
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
 
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(950, ctx.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.22);
-
-  gain.gain.setValueAtTime(0.12, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-
-  oscillator.connect(gain);
-  gain.connect(ctx.destination);
-  oscillator.start();
-  oscillator.stop(ctx.currentTime + 0.22);
-}
-
-function playAluminumHitSound(isHomeRun) {
-  const baseVolume = isHomeRun ? 0.22 : 0.16;
-
-  playTone(1220, 0.08, "triangle", baseVolume);
-  playTone(1860, 0.16, "sine", baseVolume * 0.8, 0.02);
-  playTone(2440, 0.22, "sine", baseVolume * 0.45, 0.04);
-
-  if (isHomeRun) {
-    playTone(3200, 0.18, "sine", 0.07, 0.08);
-  }
-}
-
-function playSwingMissSound() {
-  const ctx = getAudioContext();
-  const oscillator = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  oscillator.type = "sawtooth";
-  oscillator.frequency.setValueAtTime(260, ctx.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.12);
-
-  gain.gain.setValueAtTime(0.06, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+  oscillator.frequency.setValueAtTime(950, context.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(260, context.currentTime + 0.28);
+  gain.gain.setValueAtTime(0.12, context.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.28);
 
   oscillator.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(context.destination);
   oscillator.start();
-  oscillator.stop(ctx.currentTime + 0.12);
+  oscillator.stop(context.currentTime + 0.28);
+}
+
+function playAluminumHitSound() {
+  playTone(1350, 0.08, "triangle", 0.22);
+  playTone(2050, 0.12, "sine", 0.16, 0.025);
+  playTone(780, 0.11, "square", 0.07, 0.04);
+}
+
+function playMissSound() {
+  playTone(170, 0.13, "sawtooth", 0.08);
 }
 
 function playWinSound() {
-  playTone(523, 0.16, "sine", 0.16, 0);
-  playTone(659, 0.16, "sine", 0.16, 0.16);
-  playTone(784, 0.16, "sine", 0.16, 0.32);
-  playTone(1046, 0.36, "sine", 0.18, 0.48);
+  playTone(523, 0.12, "triangle", 0.16, 0);
+  playTone(659, 0.12, "triangle", 0.16, 0.13);
+  playTone(784, 0.16, "triangle", 0.18, 0.26);
+  playTone(1046, 0.22, "triangle", 0.18, 0.43);
 }
 
 function playLoseSound() {
-  playTone(392, 0.22, "triangle", 0.14, 0);
-  playTone(330, 0.22, "triangle", 0.13, 0.22);
-  playTone(262, 0.45, "triangle", 0.12, 0.44);
+  playTone(392, 0.18, "sine", 0.14, 0);
+  playTone(330, 0.2, "sine", 0.13, 0.2);
+  playTone(262, 0.3, "sine", 0.13, 0.42);
 }
