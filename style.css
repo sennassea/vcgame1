@@ -176,57 +176,122 @@ body {
 
 .pitcher {
   position: absolute;
-  left: 90px;
-  top: 235px;
-  width: 150px;
-  height: 175px;
-  transform: rotate(-12deg);
+  left: 82px;
+  top: 220px;
+  width: 190px;
+  height: 205px;
+  transform: rotate(-8deg);
+  z-index: 4;
 }
 
 .pitcher-head {
   position: absolute;
-  left: 65px;
-  top: 10px;
-  width: 42px;
-  height: 42px;
+  left: 74px;
+  top: 14px;
+  width: 48px;
+  height: 52px;
   background: #ffd0a3;
   border: 3px solid #102033;
-  border-radius: 50%;
+  border-radius: 48% 52% 45% 50%;
 }
 
 .pitcher-cap {
   position: absolute;
-  left: 61px;
-  top: 2px;
-  width: 54px;
-  height: 24px;
+  left: 68px;
+  top: 5px;
+  width: 62px;
+  height: 26px;
   background: #0b4ea2;
   border: 3px solid #102033;
-  border-radius: 30px 30px 8px 8px;
+  border-radius: 30px 30px 9px 9px;
+}
+
+.pitcher-cap::after {
+  content: "";
+  position: absolute;
+  right: -25px;
+  top: 10px;
+  width: 32px;
+  height: 10px;
+  background: #0b4ea2;
+  border: 3px solid #102033;
+  border-left: none;
+  border-radius: 0 999px 999px 0;
 }
 
 .pitcher-body {
   position: absolute;
-  left: 38px;
-  top: 50px;
-  width: 80px;
-  height: 70px;
-  background: white;
+  left: 48px;
+  top: 64px;
+  width: 92px;
+  height: 82px;
+  background: linear-gradient(90deg, #f7fbff 0%, #ffffff 65%, #dce7f5 100%);
   border: 3px solid #102033;
-  border-radius: 18px 18px 12px 12px;
+  border-radius: 24px 24px 15px 15px;
+}
+
+.pitcher-body::before {
+  content: "7";
+  position: absolute;
+  left: 38px;
+  top: 20px;
+  color: #0b4ea2;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.pitcher-face {
+  position: absolute;
+  left: 111px;
+  top: 42px;
+  width: 12px;
+  height: 7px;
+  border-bottom: 3px solid #102033;
+  transform: rotate(-10deg);
+}
+
+.pitcher-eye {
+  position: absolute;
+  left: 107px;
+  top: 34px;
+  width: 5px;
+  height: 5px;
+  background: #102033;
+  border-radius: 50%;
 }
 
 .pitcher-arm {
   position: absolute;
-  left: 95px;
-  top: 72px;
-  width: 78px;
-  height: 18px;
+  height: 19px;
   background: #ffd0a3;
   border: 3px solid #102033;
   border-radius: 999px;
-  transform: rotate(18deg);
   transform-origin: left center;
+}
+
+.throw-arm {
+  left: 119px;
+  top: 91px;
+  width: 88px;
+  transform: rotate(13deg);
+}
+
+.glove-arm {
+  left: 35px;
+  top: 91px;
+  width: 67px;
+  transform: rotate(155deg);
+}
+
+.pitcher-glove {
+  position: absolute;
+  left: 10px;
+  top: 101px;
+  width: 32px;
+  height: 28px;
+  background: #7a431f;
+  border: 3px solid #102033;
+  border-radius: 40% 55% 48% 55%;
 }
 
 .pitcher-leg {
@@ -239,15 +304,26 @@ body {
 }
 
 .leg-one {
-  left: 54px;
-  top: 112px;
-  transform: rotate(-8deg);
+  left: 65px;
+  top: 140px;
+  transform: rotate(-4deg);
 }
 
 .leg-two {
-  left: 90px;
-  top: 105px;
-  transform: rotate(-42deg);
+  left: 103px;
+  top: 132px;
+  transform: rotate(-48deg);
+}
+
+.pitcher-leg::after {
+  content: "";
+  position: absolute;
+  left: -7px;
+  bottom: -11px;
+  width: 35px;
+  height: 14px;
+  background: #111827;
+  border-radius: 999px;
 }
 
 .whoosh-text {
@@ -391,7 +467,8 @@ body {
 .buttons {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 button {
@@ -402,6 +479,7 @@ button {
 
 #startButton,
 #swingButton,
+#pauseButton,
 #restartButton {
   min-width: 160px;
   padding: 16px 24px;
@@ -415,7 +493,8 @@ button {
 }
 
 #startButton:disabled,
-#swingButton:disabled {
+#swingButton:disabled,
+#pauseButton:disabled {
   background: linear-gradient(#9ca3af, #6b7280);
   cursor: not-allowed;
 }
@@ -485,7 +564,9 @@ button {
 
 @keyframes batSwing {
   0% { transform: rotate(28deg); }
-  45% { transform: rotate(-62deg); }
+  18% { transform: rotate(42deg); }
+  48% { transform: rotate(-72deg); }
+  70% { transform: rotate(-42deg); }
   100% { transform: rotate(28deg); }
 }
 
@@ -505,5 +586,5 @@ button {
   .strike-zone { left: 48%; top: 220px; }
   .bat-area { right: 10px; transform: scale(0.82); }
   .control-area { margin-top: -58px; }
-  #startButton, #swingButton { min-width: 130px; font-size: 18px; }
+  #startButton, #swingButton, #pauseButton { min-width: 120px; font-size: 17px; }
 }

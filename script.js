@@ -5,6 +5,7 @@ const ballsLeftText = document.getElementById("ballsLeft");
 const resultText = document.getElementById("resultText");
 const startButton = document.getElementById("startButton");
 const swingButton = document.getElementById("swingButton");
+const pauseButton = document.getElementById("pauseButton");
 const restartButton = document.getElementById("restartButton");
 const soundButton = document.getElementById("soundButton");
 const resultModal = document.getElementById("resultModal");
@@ -23,20 +24,25 @@ let ballX = 250;
 let ballY = 292;
 let speed = 5.8;
 let isPlaying = false;
+let isPaused = false;
 let canSwing = false;
+let waitingNextPitch = false;
 let animationId = null;
+let nextPitchTimer = null;
 let soundOn = true;
 let audioContext = null;
 
 const totalBalls = 10;
-const winScore = 10;
+const winScore = 15;
 const startX = 250;
 const endX = 760;
 
 swingButton.disabled = true;
+pauseButton.disabled = true;
 
 startButton.addEventListener("click", startGame);
 swingButton.addEventListener("click", swing);
+pauseButton.addEventListener("click", togglePause);
 restartButton.addEventListener("click", startGame);
 soundButton.addEventListener("click", toggleSound);
 
@@ -45,33 +51,48 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     swing();
   }
+
+  if (event.code === "KeyP") {
+    togglePause();
+  }
 });
 
 function startGame() {
+  clearTimeout(nextPitchTimer);
+  cancelAnimationFrame(animationId);
+
   score = 0;
   ballsLeft = totalBalls;
   speed = 5.8;
   isPlaying = true;
+  isPaused = false;
   canSwing = false;
+  waitingNextPitch = false;
 
   resultModal.classList.add("hidden");
   startButton.disabled = true;
   swingButton.disabled = false;
+  pauseButton.disabled = false;
+  pauseButton.textContent = "일시정지";
   resultText.textContent = "게임 시작!";
   updateScoreBoard();
   resetBall();
 
-  setTimeout(throwBall, 500);
+  nextPitchTimer = setTimeout(throwBall, 500);
 }
 
 function throwBall() {
-  if (!isPlaying) return;
+  if (!isPlaying || isPaused) {
+    waitingNextPitch = true;
+    return;
+  }
 
   if (ballsLeft <= 0) {
     endGame();
     return;
   }
 
+  waitingNextPitch = false;
   resetBall();
   canSwing = true;
   playPitchSound();
@@ -80,6 +101,8 @@ function throwBall() {
 }
 
 function moveBall() {
+  if (!isPlaying || isPaused) return;
+
   ballX += speed;
   updateBallPosition();
 
@@ -103,7 +126,7 @@ function updateBallPosition() {
 }
 
 function swing() {
-  if (!isPlaying || !canSwing) return;
+  if (!isPlaying || isPaused || !canSwing) return;
 
   canSwing = false;
   cancelAnimationFrame(animationId);
@@ -111,10 +134,14 @@ function swing() {
 
   const hitResult = judgeHit();
 
-  if (hitResult === "homerun") {
+  if (hitResult === "perfect") {
+    score += 3;
+    resultText.textContent = "퍼펙트 홈런! +3점";
+    playPerfectHomerunSound();
+  } else if (hitResult === "homerun") {
     score += 2;
     resultText.textContent = "홈런! +2점";
-    playAluminumHitSound();
+    playHomerunSound();
   } else if (hitResult === "hit") {
     score += 1;
     resultText.textContent = "안타! +1점";
@@ -126,7 +153,7 @@ function swing() {
 
   ballsLeft -= 1;
   updateScoreBoard();
-  setTimeout(throwBall, 900);
+  scheduleNextPitch(900);
 }
 
 function judgeHit() {
@@ -136,6 +163,16 @@ function judgeHit() {
 
   const ballArea = ballRect.width * ballRect.height;
   const yellowOverlapArea = getOverlapArea(ballRect, yellowRect);
+
+  const isBallFullyInYellow =
+    ballRect.left >= yellowRect.left &&
+    ballRect.right <= yellowRect.right &&
+    ballRect.top >= yellowRect.top &&
+    ballRect.bottom <= yellowRect.bottom;
+
+  if (isBallFullyInYellow) {
+    return "perfect";
+  }
 
   if (yellowOverlapArea >= ballArea * 0.5) {
     return "homerun";
@@ -169,7 +206,40 @@ function missPitch() {
   resultText.textContent = "공을 놓쳤습니다!";
   ballsLeft -= 1;
   updateScoreBoard();
-  setTimeout(throwBall, 700);
+  scheduleNextPitch(700);
+}
+
+function scheduleNextPitch(delay) {
+  clearTimeout(nextPitchTimer);
+  waitingNextPitch = true;
+  nextPitchTimer = setTimeout(() => {
+    if (isPaused) return;
+    throwBall();
+  }, delay);
+}
+
+function togglePause() {
+  if (!isPlaying) return;
+
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    cancelAnimationFrame(animationId);
+    clearTimeout(nextPitchTimer);
+    pauseButton.textContent = "계속하기";
+    resultText.textContent = "일시정지";
+    swingButton.disabled = true;
+  } else {
+    pauseButton.textContent = "일시정지";
+    swingButton.disabled = false;
+    resultText.textContent = "게임 재개!";
+
+    if (canSwing) {
+      animationId = requestAnimationFrame(moveBall);
+    } else if (waitingNextPitch) {
+      nextPitchTimer = setTimeout(throwBall, 350);
+    }
+  }
 }
 
 function updateScoreBoard() {
@@ -179,16 +249,23 @@ function updateScoreBoard() {
 
 function endGame() {
   isPlaying = false;
+  isPaused = false;
   canSwing = false;
+  waitingNextPitch = false;
+  clearTimeout(nextPitchTimer);
+  cancelAnimationFrame(animationId);
+
   startButton.disabled = false;
   swingButton.disabled = true;
+  pauseButton.disabled = true;
+  pauseButton.textContent = "일시정지";
   finalScore.textContent = score;
 
   if (score >= winScore) {
     modalCard.classList.remove("lose");
     modalIcon.textContent = "🏆";
     modalTitle.textContent = "승리!";
-    modalMessage.textContent = "10점 이상 달성! 홈런왕이에요!";
+    modalMessage.textContent = "15점 이상 달성! 진짜 홈런왕이에요!";
     resultText.textContent = `승리! 최종 ${score}점`;
     playWinSound();
   } else {
@@ -245,6 +322,29 @@ function playTone(frequency, duration, type = "sine", volume = 0.15, startTime =
   oscillator.stop(context.currentTime + startTime + duration);
 }
 
+function playNoise(duration = 0.25, volume = 0.12, startTime = 0) {
+  if (!soundOn) return;
+
+  const context = getAudioContext();
+  const bufferSize = context.sampleRate * duration;
+  const buffer = context.createBuffer(1, bufferSize, context.sampleRate);
+  const data = buffer.getChannelData(0);
+
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+
+  const source = context.createBufferSource();
+  const gain = context.createGain();
+  source.buffer = buffer;
+  gain.gain.setValueAtTime(volume, context.currentTime + startTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + startTime + duration);
+  source.connect(gain);
+  gain.connect(context.destination);
+  source.start(context.currentTime + startTime);
+  source.stop(context.currentTime + startTime + duration);
+}
+
 function playPitchSound() {
   if (!soundOn) return;
 
@@ -253,8 +353,8 @@ function playPitchSound() {
   const gain = context.createGain();
 
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(950, context.currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(260, context.currentTime + 0.28);
+  oscillator.frequency.setValueAtTime(980, context.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(250, context.currentTime + 0.28);
   gain.gain.setValueAtTime(0.12, context.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.28);
 
@@ -265,9 +365,31 @@ function playPitchSound() {
 }
 
 function playAluminumHitSound() {
-  playTone(1350, 0.08, "triangle", 0.22);
-  playTone(2050, 0.12, "sine", 0.16, 0.025);
-  playTone(780, 0.11, "square", 0.07, 0.04);
+  playTone(1850, 0.06, "triangle", 0.22);
+  playTone(2650, 0.12, "sine", 0.15, 0.015);
+  playTone(1250, 0.18, "sine", 0.08, 0.035);
+  playNoise(0.06, 0.06, 0);
+}
+
+function playHomerunSound() {
+  playNoise(0.08, 0.14, 0);
+  playTone(210, 0.08, "square", 0.15, 0);
+  playTone(1850, 0.14, "triangle", 0.28, 0.02);
+  playTone(2950, 0.23, "sine", 0.18, 0.04);
+  playTone(880, 0.18, "sine", 0.1, 0.09);
+}
+
+function playPerfectHomerunSound() {
+  playHomerunSound();
+  playCrowdCheerSound(0.18);
+}
+
+function playCrowdCheerSound(startTime = 0) {
+  playNoise(0.95, 0.16, startTime);
+  playTone(520, 0.18, "triangle", 0.08, startTime + 0.08);
+  playTone(660, 0.18, "triangle", 0.08, startTime + 0.22);
+  playTone(780, 0.2, "triangle", 0.08, startTime + 0.36);
+  playTone(980, 0.25, "triangle", 0.07, startTime + 0.52);
 }
 
 function playMissSound() {
