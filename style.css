@@ -1166,3 +1166,385 @@ button {
   78% { transform: scale(0.78) rotate(3deg) translateX(8px); }
   100% { transform: scale(0.78) rotate(-3deg) translateX(0); }
 }
+
+/* v10: 갈색 덩어리 제거 + 글러브 착용형 현실감 있는 투수 디자인 */
+.pitcher {
+  left: 70px;
+  top: 198px;
+  width: 250px;
+  height: 270px;
+  transform: rotate(0deg);
+  transform-origin: 52% 88%;
+  z-index: 6;
+}
+
+.pitcher-shadow {
+  position: absolute;
+  left: 48px;
+  bottom: 2px;
+  width: 130px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.pitcher-neck {
+  position: absolute;
+  left: 119px;
+  top: 75px;
+  width: 25px;
+  height: 22px;
+  background: linear-gradient(#ffd3a8, #f3b981);
+  border: 3px solid #102033;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  z-index: 2;
+}
+
+.pitcher-head {
+  left: 100px;
+  top: 24px;
+  width: 62px;
+  height: 66px;
+  background: linear-gradient(135deg, #ffe0bd 0%, #ffd0a3 68%, #f1ae77 100%);
+  border: 3px solid #102033;
+  border-radius: 48% 52% 44% 48%;
+  box-shadow: inset -7px -5px 0 rgba(150, 80, 35, 0.14);
+  z-index: 5;
+}
+
+.pitcher-head::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 30px;
+  width: 10px;
+  height: 16px;
+  background: #f3b981;
+  border: 3px solid #102033;
+  border-right: none;
+  border-radius: 999px 0 0 999px;
+}
+
+.pitcher-cap {
+  left: 90px;
+  top: 10px;
+  width: 78px;
+  height: 34px;
+  background: linear-gradient(#1e73dd, #0b4ea2);
+  border: 3px solid #102033;
+  border-radius: 38px 38px 12px 12px;
+  z-index: 7;
+}
+
+.pitcher-cap::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 5px;
+  width: 24px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  transform: rotate(-12deg);
+}
+
+.pitcher-cap::after {
+  right: -35px;
+  top: 13px;
+  width: 45px;
+  height: 12px;
+  background: linear-gradient(#1e73dd, #0b4ea2);
+  border: 3px solid #102033;
+  border-left: none;
+  border-radius: 0 999px 999px 0;
+}
+
+.pitcher-face {
+  left: 141px;
+  top: 56px;
+  width: 16px;
+  height: 9px;
+  border-bottom: 3px solid #102033;
+  border-radius: 50%;
+  transform: rotate(-4deg);
+  z-index: 8;
+}
+
+.pitcher-eye {
+  left: 137px;
+  top: 47px;
+  width: 6px;
+  height: 6px;
+  background: #102033;
+  border-radius: 50%;
+  z-index: 8;
+}
+
+.pitcher-body {
+  left: 69px;
+  top: 91px;
+  width: 110px;
+  height: 108px;
+  background:
+    linear-gradient(90deg, transparent 0 47%, rgba(11, 78, 162, 0.28) 47% 50%, transparent 50% 100%),
+    linear-gradient(90deg, #ffffff 0%, #f6faff 58%, #dfeaf8 100%);
+  border: 3px solid #102033;
+  border-radius: 34px 36px 20px 20px;
+  transform: rotate(1deg);
+  box-shadow: inset -10px 0 0 rgba(11, 78, 162, 0.08);
+  z-index: 2;
+}
+
+.pitcher-body::before {
+  content: "P";
+  position: absolute;
+  left: 42px;
+  top: 28px;
+  color: #0b4ea2;
+  font-size: 34px;
+  font-weight: 900;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.14);
+}
+
+.pitcher-body::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 12px;
+  width: 28px;
+  height: 34px;
+  border-left: 4px solid #0b4ea2;
+  border-bottom: 4px solid #0b4ea2;
+  border-radius: 0 0 0 26px;
+  opacity: 0.8;
+}
+
+.pitcher-belt {
+  position: absolute;
+  left: 74px;
+  top: 185px;
+  width: 101px;
+  height: 12px;
+  background: #111827;
+  border: 3px solid #102033;
+  border-radius: 999px;
+  z-index: 4;
+}
+
+.pitcher-belt::after {
+  content: "";
+  position: absolute;
+  left: 43px;
+  top: -2px;
+  width: 14px;
+  height: 10px;
+  border: 2px solid #cbd5e1;
+  border-radius: 3px;
+}
+
+.pitcher-arm {
+  height: 24px;
+  background: linear-gradient(#ffe0bd, #f3b981);
+  border: 3px solid #102033;
+  border-radius: 999px;
+  z-index: 4;
+}
+
+.pitcher-arm::before {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: -4px;
+  width: 22px;
+  height: 22px;
+  background: #ffd0a3;
+  border: 3px solid #102033;
+  border-radius: 50%;
+}
+
+.throw-arm {
+  left: 144px;
+  top: 103px;
+  width: 84px;
+  transform-origin: 5px 50%;
+  transform: rotate(-54deg);
+  z-index: 3;
+}
+
+/* 이전 버전에서 손 옆에 떠 보이던 공/덩어리 표시 제거 */
+.throw-arm::after {
+  content: "" !important;
+  display: none !important;
+  animation: none !important;
+}
+
+.glove-arm {
+  left: 90px;
+  top: 115px;
+  width: 76px;
+  transform-origin: 8px 50%;
+  transform: rotate(-3deg);
+  z-index: 5;
+}
+
+.pitcher-glove {
+  left: 144px;
+  top: 91px;
+  width: 56px;
+  height: 62px;
+  background:
+    radial-gradient(circle at 66% 68%, rgba(255, 215, 160, 0.42) 0 17%, transparent 18%),
+    radial-gradient(circle at 36% 33%, #b26a33 0%, #8b4f25 48%, #623413 100%);
+  border: 4px solid #102033;
+  border-radius: 46% 54% 52% 48%;
+  transform: rotate(-9deg);
+  z-index: 8;
+  box-shadow: inset -7px -5px 0 rgba(0, 0, 0, 0.16);
+}
+
+.pitcher-glove::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 5px;
+  width: 35px;
+  height: 28px;
+  border-top: 4px solid rgba(43, 24, 11, 0.62);
+  border-left: 3px solid rgba(43, 24, 11, 0.5);
+  border-radius: 50%;
+  box-shadow:
+    9px 2px 0 -6px rgba(43, 24, 11, 0.75),
+    18px 4px 0 -6px rgba(43, 24, 11, 0.75),
+    27px 7px 0 -7px rgba(43, 24, 11, 0.75);
+}
+
+.pitcher-glove::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  bottom: 8px;
+  width: 30px;
+  height: 16px;
+  border: 3px solid rgba(43, 24, 11, 0.52);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+}
+
+.pitcher-leg {
+  width: 27px;
+  height: 86px;
+  background:
+    linear-gradient(90deg, transparent 0 42%, rgba(11, 78, 162, 0.5) 42% 52%, transparent 52% 100%),
+    linear-gradient(90deg, #ffffff 0%, #eef5ff 70%);
+  border: 3px solid #102033;
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.leg-one {
+  left: 88px;
+  top: 195px;
+  transform: rotate(5deg);
+}
+
+.leg-two {
+  left: 137px;
+  top: 168px;
+  height: 92px;
+  transform: rotate(-58deg);
+  transform-origin: 50% 9%;
+}
+
+.pitcher-leg::after {
+  left: -10px;
+  bottom: -14px;
+  width: 48px;
+  height: 17px;
+  background: #0f172a;
+  border: 3px solid #102033;
+  border-radius: 999px;
+}
+
+.pitcher.throwing {
+  animation: pitcherBodyThrowV10 0.78s ease-in-out;
+}
+
+.pitcher.throwing .throw-arm {
+  animation: throwArmMotionV10 0.78s ease-in-out;
+}
+
+.pitcher.throwing .glove-arm,
+.pitcher.throwing .pitcher-glove {
+  animation: glovePullMotionV10 0.78s ease-in-out;
+}
+
+.pitcher.throwing .leg-two {
+  animation: legKickMotionV10 0.78s ease-in-out;
+}
+
+.pitcher.throwing .pitcher-head,
+.pitcher.throwing .pitcher-cap,
+.pitcher.throwing .pitcher-face,
+.pitcher.throwing .pitcher-eye {
+  animation: headFollowMotionV10 0.78s ease-in-out;
+}
+
+@keyframes pitcherBodyThrowV10 {
+  0% { transform: rotate(0deg) translateX(0); }
+  22% { transform: rotate(-6deg) translate(-5px, -1px); }
+  52% { transform: rotate(7deg) translate(14px, 2px); }
+  76% { transform: rotate(2deg) translate(7px, 0); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+
+@keyframes throwArmMotionV10 {
+  0% { transform: rotate(-54deg); }
+  25% { transform: rotate(-126deg); }
+  50% { transform: rotate(-8deg); }
+  67% { transform: rotate(30deg); }
+  100% { transform: rotate(-54deg); }
+}
+
+@keyframes glovePullMotionV10 {
+  0% { transform: rotate(-9deg) translate(0, 0); }
+  28% { transform: rotate(-15deg) translate(-4px, -2px); }
+  56% { transform: rotate(-20deg) translate(-13px, 8px); }
+  100% { transform: rotate(-9deg) translate(0, 0); }
+}
+
+@keyframes legKickMotionV10 {
+  0% { transform: rotate(-58deg) translateY(0); }
+  25% { transform: rotate(-83deg) translateY(-14px); }
+  56% { transform: rotate(-20deg) translate(22px, 11px); }
+  100% { transform: rotate(-58deg) translateY(0); }
+}
+
+@keyframes headFollowMotionV10 {
+  0% { transform: translateX(0); }
+  45% { transform: translateX(4px); }
+  70% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+
+@media (max-width: 760px) {
+  .pitcher {
+    left: 8px;
+    top: 206px;
+    transform: scale(0.72) rotate(0deg);
+    transform-origin: 50% 88%;
+  }
+
+  .pitcher.throwing {
+    animation: pitcherBodyThrowV10Mobile 0.78s ease-in-out;
+  }
+}
+
+@keyframes pitcherBodyThrowV10Mobile {
+  0% { transform: scale(0.72) rotate(0deg) translateX(0); }
+  22% { transform: scale(0.72) rotate(-6deg) translate(-5px, -1px); }
+  52% { transform: scale(0.72) rotate(7deg) translate(14px, 2px); }
+  76% { transform: scale(0.72) rotate(2deg) translate(7px, 0); }
+  100% { transform: scale(0.72) rotate(0deg) translateX(0); }
+}
