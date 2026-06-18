@@ -588,3 +588,129 @@ button {
   .control-area { margin-top: -58px; }
   #startButton, #swingButton, #pauseButton { min-width: 120px; font-size: 17px; }
 }
+
+.result-summary,
+.ranking-area {
+  margin: 18px auto 0;
+  padding: 14px;
+  background: #f3f7fb;
+  border: 2px solid #d7e2ee;
+  border-radius: 14px;
+  text-align: left;
+}
+
+.result-summary h3,
+.ranking-area h3 {
+  margin-bottom: 10px;
+  color: #102033;
+  font-size: 20px;
+  text-align: center;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.summary-grid div {
+  padding: 10px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #d7e2ee;
+}
+
+.summary-grid span {
+  display: block;
+  color: #5b6776;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.summary-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: #102033;
+  font-size: 18px;
+}
+
+.ranking-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ranking-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 2px solid #b9c7d6;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+#saveRankButton {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(#17a74a, #0f7d34);
+  color: white;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+#saveRankButton:disabled {
+  background: linear-gradient(#9ca3af, #6b7280);
+  cursor: not-allowed;
+}
+
+.ranking-list {
+  list-style-position: inside;
+  max-height: 176px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.ranking-list li {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: white;
+  border: 1px solid #d7e2ee;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.ranking-list .rank-number {
+  color: #0b4ea2;
+}
+
+.ranking-list .rank-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-list .rank-score {
+  color: #c47b00;
+}
+
+.empty-ranking {
+  padding: 10px;
+  color: #667085;
+  text-align: center;
+  font-weight: 800;
+}
+
+@media (max-width: 560px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking-form {
+    flex-direction: column;
+  }
+}
