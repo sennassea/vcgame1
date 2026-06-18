@@ -9,7 +9,7 @@
 <body>
   <main class="game-container">
     <h1>⚾ 홈런 타이밍 게임</h1>
-    <p class="description">공이 스트라이크 존에 들어왔을 때 스페이스바를 누르세요!</p>
+    <p class="description">공이 타격존 중앙에 왔을 때 스윙하면 홈런!</p>
 
     <section class="score-board">
       <div>점수: <span id="score">0</span></div>
@@ -18,11 +18,12 @@
     </section>
 
     <section class="field" id="field">
-      <div class="pitcher" aria-label="투수">🤾</div>
-      <div class="strike-zone"></div>
-      <div class="bat" aria-label="야구 배트">
-        <div class="bat-barrel"></div>
-        <div class="bat-handle"></div>
+      <div class="pitcher">🤾‍♂️</div>
+      <div class="hit-zone">
+        <div class="home-run-zone"></div>
+      </div>
+      <div class="batter-area">
+        <div class="aluminum-bat"></div>
       </div>
       <div class="ball" id="ball">⚾</div>
     </section>
@@ -33,9 +34,19 @@
     </section>
 
     <p class="guide">
-      조작: <strong>스페이스바</strong> 또는 <strong>스윙 버튼</strong>
+      조작: <strong>스페이스바</strong> 또는 <strong>스윙 버튼</strong><br />
+      안타: 1점 / 홈런: 2점 / 10점 이상이면 승리
     </p>
   </main>
+
+  <div class="result-modal hidden" id="resultModal">
+    <div class="modal-card" id="modalCard">
+      <p class="modal-emoji" id="modalEmoji">🏆</p>
+      <h2 id="modalTitle">승리!</h2>
+      <p id="modalMessage">결과 메시지</p>
+      <button id="restartButton">다시 시작</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

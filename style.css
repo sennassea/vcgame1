@@ -62,47 +62,73 @@ h1 {
   transform: scaleX(-1);
 }
 
-.strike-zone {
+.batter-area {
   position: absolute;
-  right: 145px;
-  top: 85px;
-  width: 85px;
-  height: 95px;
+  right: 35px;
+  top: 78px;
+  width: 90px;
+  height: 130px;
+}
+
+.aluminum-bat {
+  position: absolute;
+  right: 28px;
+  bottom: 14px;
+  width: 18px;
+  height: 112px;
+  border-radius: 12px 12px 8px 8px;
+  background: linear-gradient(90deg, #9ca3af, #f8fafc, #9ca3af);
+  border: 2px solid #6b7280;
+  transform: rotate(35deg);
+  transform-origin: bottom center;
+  box-shadow: inset 3px 0 5px rgba(255, 255, 255, 0.7), inset -3px 0 5px rgba(0, 0, 0, 0.15);
+}
+
+.aluminum-bat::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  width: 10px;
+  height: 34px;
+  background: linear-gradient(90deg, #374151, #111827, #374151);
+  border-radius: 6px;
+  transform: translateX(-50%);
+}
+
+.aluminum-bat::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -34px;
+  width: 22px;
+  height: 9px;
+  background-color: #111827;
+  border-radius: 999px;
+  transform: translateX(-50%);
+}
+
+.hit-zone {
+  position: absolute;
+  right: 158px;
+  top: 96px;
+  width: 57px;
+  height: 63px;
   border: 4px dashed #ffffff;
   background-color: rgba(255, 255, 255, 0.18);
   border-radius: 8px;
 }
 
-.bat {
+.home-run-zone {
   position: absolute;
-  right: 55px;
-  top: 76px;
-  width: 44px;
-  height: 130px;
-  transform: rotate(35deg);
-  transform-origin: center bottom;
-}
-
-.bat-barrel {
-  position: absolute;
-  left: 10px;
-  top: 0;
+  left: 50%;
+  top: 50%;
   width: 24px;
-  height: 92px;
-  background: linear-gradient(90deg, #b97832, #f2c078, #9a5a21);
-  border: 2px solid #6b3f1d;
-  border-radius: 16px 16px 10px 10px;
-}
-
-.bat-handle {
-  position: absolute;
-  left: 17px;
-  bottom: 0;
-  width: 10px;
-  height: 48px;
-  background: linear-gradient(90deg, #4b2b16, #8b5a2b, #4b2b16);
-  border: 2px solid #3a220f;
-  border-radius: 8px;
+  height: 28px;
+  border: 3px solid #fde047;
+  background-color: rgba(253, 224, 71, 0.25);
+  border-radius: 6px;
+  transform: translate(-50%, -50%);
 }
 
 .ball {
@@ -111,14 +137,6 @@ h1 {
   top: 125px;
   font-size: 30px;
   transform: translate(-50%, -50%);
-}
-
-.ball.hit {
-  animation: hit-pop 0.25s ease-out;
-}
-
-.bat.swing {
-  animation: bat-swing 0.25s ease-out;
 }
 
 .controls {
@@ -151,28 +169,52 @@ button:disabled {
 .guide {
   margin-top: 16px;
   color: #4b5563;
+  line-height: 1.6;
 }
 
-@keyframes bat-swing {
-  0% {
-    transform: rotate(35deg);
-  }
-  50% {
-    transform: rotate(-18deg);
-  }
-  100% {
-    transform: rotate(35deg);
-  }
+.result-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(17, 24, 39, 0.65);
 }
 
-@keyframes hit-pop {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.35);
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
+.result-modal.hidden {
+  display: none;
+}
+
+.modal-card {
+  width: min(90%, 390px);
+  padding: 32px 24px;
+  background-color: white;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-card.win {
+  border: 6px solid #facc15;
+}
+
+.modal-card.lose {
+  border: 6px solid #94a3b8;
+}
+
+.modal-emoji {
+  margin-bottom: 10px;
+  font-size: 58px;
+}
+
+.modal-card h2 {
+  margin-bottom: 10px;
+  font-size: 30px;
+}
+
+.modal-card p {
+  margin-bottom: 20px;
+  color: #4b5563;
+  line-height: 1.6;
 }
