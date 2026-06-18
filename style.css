@@ -59,13 +59,6 @@ h1 {
   left: 40px;
   top: 105px;
   font-size: 52px;
-}
-
-.batter {
-  position: absolute;
-  right: 42px;
-  top: 100px;
-  font-size: 58px;
   transform: scaleX(-1);
 }
 
@@ -80,12 +73,52 @@ h1 {
   border-radius: 8px;
 }
 
+.bat {
+  position: absolute;
+  right: 55px;
+  top: 76px;
+  width: 44px;
+  height: 130px;
+  transform: rotate(35deg);
+  transform-origin: center bottom;
+}
+
+.bat-barrel {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  width: 24px;
+  height: 92px;
+  background: linear-gradient(90deg, #b97832, #f2c078, #9a5a21);
+  border: 2px solid #6b3f1d;
+  border-radius: 16px 16px 10px 10px;
+}
+
+.bat-handle {
+  position: absolute;
+  left: 17px;
+  bottom: 0;
+  width: 10px;
+  height: 48px;
+  background: linear-gradient(90deg, #4b2b16, #8b5a2b, #4b2b16);
+  border: 2px solid #3a220f;
+  border-radius: 8px;
+}
+
 .ball {
   position: absolute;
   left: 95px;
   top: 125px;
   font-size: 30px;
   transform: translate(-50%, -50%);
+}
+
+.ball.hit {
+  animation: hit-pop 0.25s ease-out;
+}
+
+.bat.swing {
+  animation: bat-swing 0.25s ease-out;
 }
 
 .controls {
@@ -118,4 +151,28 @@ button:disabled {
 .guide {
   margin-top: 16px;
   color: #4b5563;
+}
+
+@keyframes bat-swing {
+  0% {
+    transform: rotate(35deg);
+  }
+  50% {
+    transform: rotate(-18deg);
+  }
+  100% {
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes hit-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.35);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
